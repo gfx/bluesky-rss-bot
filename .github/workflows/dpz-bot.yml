@@ -1,0 +1,24 @@
+name: "DPZ Bot"
+
+on:
+  # run it on every 7 minutes
+  schedule:
+    - cron: "*/7 * * * *"
+    workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      run: cargo build
+    - name: Run run
+      run: cargo run
+      env:
+        RSS_URL: ${{ secrets.RSS_URL }}
+        BSKY_ID: ${{ secrets.BSKY_ID }}
+        BSKY_PASSWORD: ${{ secrets.BSKY_PASSWORD }}
