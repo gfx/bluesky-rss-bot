@@ -24,8 +24,7 @@ pub struct Ogp {
 fn find_property_content(attrs: &Vec<Attribute>, property: &str) -> Option<String> {
     if attrs
         .iter()
-        .find(|a| a.name.local == NAME_PROPERTY && a.value.to_lowercase() == property)
-        .is_some()
+        .any(|a| a.name.local == NAME_PROPERTY && a.value.to_lowercase() == property)
     {
         // then get the value of the `content` attribute
         if let Some(content) = attrs

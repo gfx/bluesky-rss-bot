@@ -125,7 +125,7 @@ async fn create_embed_ogp<S: SessionStore + Send + Sync, T: XrpcClient + Send + 
         },
     ));
 
-    return Ok(embed);
+    Ok(embed)
 }
 
 async fn post_entry<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync>(
