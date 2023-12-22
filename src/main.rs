@@ -203,7 +203,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let rss_url = std::env::var("RSS_URL")?;
     let bsky_id = std::env::var("BSKY_ID")?;
     let bsky_password = std::env::var("BSKY_PASSWORD")?;
-    let bsky_api_url = std::env::var("BSKY_API_URL").unwrap_or_else(|_| BSKY_API_DEFAULT_URL.into());
+    let bsky_api_url =
+        std::env::var("BSKY_API_URL").unwrap_or_else(|_| BSKY_API_DEFAULT_URL.into());
 
     let bsky_agent = AtpAgent::new(
         ReqwestClient::new(bsky_api_url),

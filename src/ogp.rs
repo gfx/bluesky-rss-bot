@@ -21,7 +21,7 @@ pub struct Ogp {
 
 // find a `content` attribute that has a specified `property` attribute,
 // e.g. find_property_content("og:image") will return the `content` (i.e. url) of <meta property="og:image" content="...">
-fn find_property_content(attrs: &Vec<Attribute>, property: &str) -> Option<String> {
+fn find_property(attrs: &[Attribute], property: &str) -> Option<String> {
     if attrs
         .iter()
         .any(|a| a.name.local == NAME_PROPERTY && a.value.to_lowercase() == property)
@@ -42,30 +42,25 @@ impl TokenSink for Ogp {
     type Handle = ();
 
     fn process_token(&mut self, token: Token, _line_number: u64) -> TokenSinkResult<()> {
-        match token {
-            Token::TagToken(Tag {
-                kind: TagKind::StartTag,
-                name,
-                self_closing: _,
-                attrs,
-            }) => match name {
-                NAME_META => {
-                    if let Some(og_title) = find_property_content(&attrs, "og:title") {
-                        self.og_title = Some(og_title);
-                    }
-                    if let Some(og_description) = find_property_content(&attrs, "og:description") {
-                        self.og_description = Some(og_description);
-                    }
-                    if let Some(og_url) = find_property_content(&attrs, "og:url") {
-                        self.og_url = Some(og_url);
-                    }
-                    if let Some(og_image) = find_property_content(&attrs, "og:image") {
-                        self.og_image = Some(og_image);
-                    }
-                }
-                _ => {}
-            },
-            _ => {}
+        if let Token::TagToken(Tag {
+            kind: TagKind::StartTag,
+            name: NAME_META,
+            self_closing: _,
+            attrs,
+        }) = token
+        {
+            if let Some(og_title) = find_property(&attrs, "og:title") {
+                self.og_title = Some(og_title);
+            }
+            if let Some(og_desc) = find_property(&attrs, "og:description") {
+                self.og_description = Some(og_desc);
+            }
+            if let Some(og_url) = find_property(&attrs, "og:url") {
+                self.og_url = Some(og_url);
+            }
+            if let Some(og_image) = find_property(&attrs, "og:image") {
+                self.og_image = Some(og_image);
+            }
         }
         TokenSinkResult::Continue
     }
