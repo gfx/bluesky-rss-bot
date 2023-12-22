@@ -19,6 +19,6 @@ jobs:
     - name: Run run
       run: cargo run
       env:
-        RSS_URL: ${{ secrets.BSKY_DPZ_BOT_RSS_URL }}
+        RSS_URL: https://dailyportalz.jp/feed/headline
         BSKY_ID: ${{ secrets.BSKY_DBZ_BOT_ID }}
         BSKY_PASSWORD: ${{ secrets.BSKY_DPZ_BOT_PASSWORD }}
