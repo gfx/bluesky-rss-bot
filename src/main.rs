@@ -205,6 +205,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let bsky_password = std::env::var("BSKY_PASSWORD")?;
     let bsky_api_url =
         std::env::var("BSKY_API_URL").unwrap_or_else(|_| BSKY_API_DEFAULT_URL.into());
+    let do_not_post = std::env::var("DO_NOT_POST").is_ok();
 
     let bsky_agent = AtpAgent::new(
         ReqwestClient::new(bsky_api_url),
@@ -219,7 +220,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let feed = get_feed(rss_url).await?;
     let posts = get_bsky_posts(&bsky_agent).await?;
     let new_entries = find_new_entries(&session, feed, posts).await?;
-    post_entries(&bsky_agent, &session, new_entries).await?;
+
+    if !do_not_post {
+        post_entries(&bsky_agent, &session, new_entries).await?;
+    } else {
+        println!("Found {} new entries", new_entries.len());
+        for entry in new_entries {
+            println!("  {} {}", entry.title.as_ref().unwrap().content, entry.id);
+        }
+    }
 
     Ok(())
 }
