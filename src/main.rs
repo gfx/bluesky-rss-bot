@@ -29,14 +29,16 @@ async fn get_feed(url: String) -> Result<Feed, Box<dyn std::error::Error>> {
 
 async fn get_bsky_posts<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync>(
     agent: &AtpAgent<S, T>,
+    session: &Session,
 ) -> Result<Vec<FeedViewPost>, Box<dyn std::error::Error>> {
     let posts = agent
         .api
         .app
         .bsky
         .feed
-        .get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
-            algorithm: None,
+        .get_author_feed(atrium_api::app::bsky::feed::get_author_feed::Parameters {
+            actor: session.handle.clone(),
+            filter: Some("posts_no_replies".into()),
             cursor: None,
             limit: Some(10),
         })
@@ -218,7 +220,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     let feed = get_feed(rss_url).await?;
-    let posts = get_bsky_posts(&bsky_agent).await?;
+    let posts = get_bsky_posts(&bsky_agent, &session).await?;
     let new_entries = find_new_entries(&session, feed, posts).await?;
 
     if !do_not_post {
