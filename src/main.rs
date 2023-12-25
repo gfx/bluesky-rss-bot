@@ -11,7 +11,12 @@ use atrium_api::{
     xrpc::XrpcClient,
 };
 use atrium_xrpc_client::reqwest::ReqwestClient;
+use bytes::Bytes;
 use feed_rs::model::{Entry, Feed};
+use image::{
+    codecs::webp::{WebPEncoder, WebPQuality},
+    ColorType, ImageEncoder,
+};
 use unicode_normalization::UnicodeNormalization;
 
 use bluesky_rss_bot::ogp::{get_ogp, Ogp};
@@ -100,6 +105,39 @@ async fn get_ogp_from_url(url: &str) -> Result<Ogp, Box<dyn std::error::Error>> 
     Ok(get_ogp(content))
 }
 
+fn adjust_size_of_image(
+    mut blob: Bytes,
+    max_size: usize,
+) -> Result<Bytes, Box<dyn std::error::Error>> {
+    let image = image::load_from_memory(&blob)?.into_rgba8();
+
+    // try to re-encode the image to lossless WebP in any ways.
+    blob = {
+        let mut out = std::io::BufWriter::new(Vec::new());
+        WebPEncoder::new_with_quality(&mut out, WebPQuality::lossless()).write_image(
+            &image,
+            image.width(),
+            image.height(),
+            ColorType::Rgba8,
+        )?;
+        Bytes::from(out.into_inner()?)
+    };
+
+    let mut quality = 100;
+    while blob.len() > max_size {
+        let mut out = std::io::BufWriter::new(Vec::new());
+        WebPEncoder::new_with_quality(&mut out, WebPQuality::lossy(quality)).write_image(
+            &image,
+            image.width(),
+            image.height(),
+            ColorType::Rgba8,
+        )?;
+        blob = Bytes::from(out.into_inner()?);
+        quality -= 1;
+    }
+    Ok(blob)
+}
+
 async fn create_embed_ogp<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync>(
     agent: &AtpAgent<S, T>,
     source_url: &str,
@@ -108,7 +146,9 @@ async fn create_embed_ogp<S: SessionStore + Send + Sync, T: XrpcClient + Send + 
     let og_image = ogp
         .og_image
         .ok_or_else(|| format!("og:image is not found in {:?}", source_url))?;
-    let blob = reqwest::get(og_image).await?.bytes().await?;
+    let max_blob_size = 1_000_000; // 1MB (not 1MiB)
+    let blob = adjust_size_of_image(reqwest::get(og_image).await?.bytes().await?, max_blob_size)?;
+
     let uploaded_blob = agent
         .api
         .com
