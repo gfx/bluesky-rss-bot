@@ -9,8 +9,6 @@ tokio = { version = "1", features = ["full"] }
 feed-rs = { version = "1" }
 atrium-api = { version = "0.15" }
 atrium-xrpc-client = { version = "0.2" }
-serde = { version = "1" }
-serde_json = { version = "1" }
 unicode-normalization = { version = "0.1" }
 chrono = { version = "0.4" }
 html5ever = { version = "0.26" }

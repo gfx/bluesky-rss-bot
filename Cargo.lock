@@ -204,8 +204,6 @@ dependencies = [
  "feed-rs",
  "html5ever",
  "reqwest",
- "serde",
- "serde_json",
  "tokio",
  "unicode-normalization",
 ]
