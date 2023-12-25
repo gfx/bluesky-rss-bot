@@ -3,7 +3,7 @@ name: "DPZ Bot"
 on:
   # run it on every 7 minutes
   schedule:
-    - cron: "*/7 * * * *"
+    - cron: "*/13 * * * *"
   workflow_dispatch:
 
 env:
