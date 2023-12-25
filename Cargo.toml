@@ -7,7 +7,7 @@ edition = "2021"
 reqwest = { version = "0.11", features = [] }
 tokio = { version = "1", features = ["full"] }
 feed-rs = { version = "1" }
-atrium-api = { version = "0.14" }
+atrium-api = { version = "0.15" }
 atrium-xrpc-client = { version = "0.2" }
 serde = { version = "1" }
 serde_json = { version = "1" }
