@@ -191,9 +191,15 @@ async fn post_entries<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync
     agent: &AtpAgent<S, T>,
     session: &Session,
     entries: Vec<Entry>,
+    max_bsky_posts: i32,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    let mut count = 0;
     for entry in entries.into_iter().rev() {
+        if count > max_bsky_posts {
+            break;
+        }
         post_entry(agent, session, entry).await?;
+        count += 1;
     }
 
     Ok(())
@@ -207,7 +213,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let bsky_password = std::env::var("BSKY_PASSWORD")?;
     let bsky_api_url =
         std::env::var("BSKY_API_URL").unwrap_or_else(|_| BSKY_API_DEFAULT_URL.into());
-    let do_not_post = std::env::var("DO_NOT_POST").is_ok();
+    let max_bsky_posts = std::env::var("MAX_BSKY_POSTS")
+        .unwrap_or("".into())
+        .parse::<i32>()
+        .unwrap_or(10);
 
     let bsky_agent = AtpAgent::new(
         ReqwestClient::new(bsky_api_url),
@@ -223,14 +232,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let posts = get_bsky_posts(&bsky_agent, &session).await?;
     let new_entries = find_new_entries(&session, feed, posts).await?;
 
-    if !do_not_post {
-        post_entries(&bsky_agent, &session, new_entries).await?;
-    } else {
-        println!("Found {} new entries", new_entries.len());
-        for entry in new_entries {
-            println!("  {} {}", entry.title.as_ref().unwrap().content, entry.id);
-        }
-    }
+    println!("Found {} new entries", new_entries.len());
+
+    post_entries(&bsky_agent, &session, new_entries, max_bsky_posts).await?;
 
     Ok(())
 }
