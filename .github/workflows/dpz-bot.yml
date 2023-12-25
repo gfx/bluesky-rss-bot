@@ -14,10 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build
-    - name: Run run
-      run: cargo run
+
+    # https://github.com/actions/cache/blob/main/examples.md#rust---cargo
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('**/rust-toolchain.toml') }}
+
+    - run: cargo build
+    - run: cargo run
       env:
         RSS_URL: https://dailyportalz.jp/feed/headline
         BSKY_ID: ${{ secrets.BSKY_DBZ_BOT_ID }}
