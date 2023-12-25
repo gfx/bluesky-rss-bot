@@ -22,7 +22,5 @@ jobs:
           ~/.cargo/git/db/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('**/rust-toolchain.toml') }}
 
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+    - run: cargo build
+    - run: cargo test --verbose

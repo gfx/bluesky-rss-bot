@@ -25,10 +25,8 @@ jobs:
           ~/.cargo/git/db/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('**/rust-toolchain.toml') }}
 
-    - name: Build
-      run: cargo build
-    - name: Run run
-      run: cargo run
+    - run: cargo build
+    - run: cargo run
       env:
         RSS_URL: https://dailyportalz.jp/feed/headline
         BSKY_ID: ${{ secrets.BSKY_DBZ_BOT_ID }}
