@@ -1,4 +1,4 @@
-# Bluesky RSS Bot [![CI](https://github.com/gfx/bluesky-rss-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/gfx/bluesky-rss-bot/actions/workflows/ci.yml) [![The Bot](https://github.com/gfx/bluesky-rss-bot/actions/workflows/dpz-bot.yml/badge.svg)](https://github.com/gfx/bluesky-rss-bot/actions/workflows/bot.yml)
+# Bluesky RSS Bot [![CI](https://github.com/gfx/bluesky-rss-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/gfx/bluesky-rss-bot/actions/workflows/ci.yml) [![The Bots](https://github.com/gfx/bluesky-rss-bot/actions/workflows/bot.yml/badge.svg)](https://github.com/gfx/bluesky-rss-bot/actions/workflows/bot.yml)
 
 Bluesky (https://bsky.app) 用のRSS botです。
 
