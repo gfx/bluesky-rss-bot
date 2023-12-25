@@ -1,4 +1,4 @@
-name: "DPZ Bot"
+name: "The Bots"
 
 on:
   # run it on every 7 minutes
@@ -27,9 +27,18 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('**/rust-toolchain.toml') }}
 
     - run: cargo build
-    - run: cargo run
+    - name: "Run for DPZ"
+      run: cargo run
       env:
         RSS_URL: https://dailyportalz.jp/feed/headline
         BSKY_ID: ${{ secrets.BSKY_DBZ_BOT_ID }}
         BSKY_PASSWORD: ${{ secrets.BSKY_DPZ_BOT_PASSWORD }}
-        MAX_BSKY_POSTS: 1
+        MAX_BSKY_POSTS: 10
+
+    - name: "Run for Gihyo.jp"
+      run: cargo run
+      env:
+        RSS_URL: https://gihyo.jp/feed/rss2
+        BSKY_ID: ${{ secrets.BSKY_GIHYO_BOT_ID }}
+        BSKY_PASSWORD: ${{ secrets.BSKY_GIHYO_BOT_PASSWORD }}
+        MAX_BSKY_POSTS: 10

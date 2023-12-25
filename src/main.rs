@@ -40,7 +40,7 @@ async fn get_bsky_posts<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sy
             actor: session.handle.clone(),
             filter: Some("posts_no_replies".into()),
             cursor: None,
-            limit: Some(10),
+            limit: Some(100),
         })
         .await?
         .feed;
@@ -55,6 +55,8 @@ async fn find_new_entries(
     posts: Vec<FeedViewPost>,
 ) -> Result<Vec<Entry>, Box<dyn std::error::Error>> {
     let mut new_entries = vec![];
+
+    let mut num_entries = 100;
 
     for entry in feed.entries {
         let mut found = false;
@@ -77,6 +79,11 @@ async fn find_new_entries(
             break;
         } else {
             new_entries.push(entry);
+
+            num_entries -= 1;
+            if num_entries <= 0 {
+                break;
+            }
         }
     }
 
@@ -153,6 +160,11 @@ async fn post_entry<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync>(
         .link(&*url)
         .build();
 
+    let created_at = entry
+        .published
+        .unwrap_or_else(|| chrono::Local::now().into())
+        .to_rfc3339();
+
     println!("Posting entry {:?} {:?}", text, embed);
 
     let result = agent
@@ -167,7 +179,7 @@ async fn post_entry<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync>(
                     text,
                     embed,
                     facets: Some(facets),
-                    created_at: chrono::Local::now().to_rfc3339(),
+                    created_at,
                     entities: None,
                     labels: None,
                     langs: None,
@@ -195,11 +207,11 @@ async fn post_entries<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut count = 0;
     for entry in entries.into_iter().rev() {
+        count += 1;
         if count > max_bsky_posts {
             break;
         }
         post_entry(agent, session, entry).await?;
-        count += 1;
     }
 
     Ok(())
