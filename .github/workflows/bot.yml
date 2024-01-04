@@ -3,7 +3,7 @@ name: "The Bots"
 on:
   # run it on every 7 minutes
   schedule:
-    - cron: "*/13 * * * *"
+    - cron: "*/7 * * * *"
   workflow_dispatch:
 
 env:
