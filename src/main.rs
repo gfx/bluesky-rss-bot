@@ -191,7 +191,7 @@ async fn post_entry<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync>(
         .nfc()
         .collect::<String>();
 
-    let embed = create_embed_ogp(agent, &url).await.ok();
+    let embed = create_embed_ogp(agent, &url).await?;
 
     // build the body of a post as a ATProtocol's rich text.
     let (text, facets) = RichTextBuilder::new()
@@ -217,7 +217,7 @@ async fn post_entry<S: SessionStore + Send + Sync, T: XrpcClient + Send + Sync>(
             record: atrium_api::records::Record::AppBskyFeedPost(Box::new(
                 atrium_api::app::bsky::feed::post::Record {
                     text,
-                    embed,
+                    embed: Some(embed),
                     facets: Some(facets),
                     created_at,
                     entities: None,
