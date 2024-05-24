@@ -110,11 +110,10 @@ fn adjust_size_of_image(
     max_size: usize,
 ) -> Result<Bytes, Box<dyn std::error::Error>> {
     let image = image::load_from_memory(&blob)?.into_rgba8();
-
     // try to re-encode the image to lossless WebP in any ways.
     blob = {
         let mut out = std::io::BufWriter::new(Vec::new());
-        WebPEncoder::new_with_quality(&mut out, WebPQuality::lossless()).write_image(
+        WebPEncoder::new_lossless(&mut out).write_image(
             &image,
             image.width(),
             image.height(),
